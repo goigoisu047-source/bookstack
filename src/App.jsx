@@ -163,26 +163,34 @@ function TowerView({ tower, allBooks, onUpdateBooks }) {
     <div style={{ width:"100%",display:"flex",flexDirection:"column",alignItems:"center" }}>
       {editingBook && <EditModal book={editingBook} onSave={handleSaveEdit} onClose={()=>setEditing(null)} />}
 
-      {/* フォーム（デフォルトタワーでも入力可） */}
-      <div style={{ background:"rgba(0,0,0,0.22)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:12,padding:"16px 18px",width:"100%",marginBottom:20,backdropFilter:"blur(8px)" }}>
-        <div style={{ display:"flex",flexDirection:"column",gap:8 }}>
-          {[
-            {key:"title",placeholder:"タイトル",type:"text"},
-            {key:"author",placeholder:"著者名",type:"text"},
-            {key:"pages",placeholder:"ページ数",type:"number"},
-          ].map(({key,placeholder,type})=>(
-            <input key={key} type={type} placeholder={placeholder} value={form[key]}
-              onChange={e=>setForm(f=>({...f,[key]:e.target.value}))}
-              onKeyDown={e=>{if(e.key==="Enter")handleAdd();}}
-              style={{ background:"rgba(255,255,255,0.06)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:8,padding:"9px 13px",color:"#EDD9B0",fontSize:14,fontFamily:"'Shippori Mincho',serif",width:"100%",letterSpacing:"0.04em" }}
-            />
-          ))}
-          {error&&<div style={{ color:"#E06050",fontSize:12,fontFamily:"'Shippori Mincho',serif" }}>{error}</div>}
-          <button onClick={handleAdd} style={{ background:"linear-gradient(135deg,#6B3A1A,#9A5528)",border:"none",borderRadius:8,padding:"10px",color:"#F5E8C8",fontSize:13,fontFamily:"'Shippori Mincho',serif",cursor:"pointer",letterSpacing:"0.1em",marginTop:2,boxShadow:"0 2px 10px rgba(0,0,0,0.4)" }}>
-            読了として積む
-          </button>
+      {/* フォーム（デフォルトタワーは非表示） */}
+      {isDefault ? (
+        <div style={{ background:"rgba(0,0,0,0.15)",border:"1px solid rgba(255,255,255,0.06)",borderRadius:12,padding:"14px 18px",width:"100%",marginBottom:20,textAlign:"center" }}>
+          <div style={{ fontSize:12,color:"rgba(180,150,80,0.5)",fontFamily:"'Shippori Mincho',serif",lineHeight:1.7,letterSpacing:"0.04em" }}>
+            すべてのタワーの本をまとめて表示しています。<br/>本を追加するには各タワーに移動してください。
+          </div>
         </div>
-      </div>
+      ) : (
+        <div style={{ background:"rgba(0,0,0,0.22)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:12,padding:"16px 18px",width:"100%",marginBottom:20,backdropFilter:"blur(8px)" }}>
+          <div style={{ display:"flex",flexDirection:"column",gap:8 }}>
+            {[
+              {key:"title",placeholder:"タイトル",type:"text"},
+              {key:"author",placeholder:"著者名",type:"text"},
+              {key:"pages",placeholder:"ページ数",type:"number"},
+            ].map(({key,placeholder,type})=>(
+              <input key={key} type={type} placeholder={placeholder} value={form[key]}
+                onChange={e=>setForm(f=>({...f,[key]:e.target.value}))}
+                onKeyDown={e=>{if(e.key==="Enter")handleAdd();}}
+                style={{ background:"rgba(255,255,255,0.06)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:8,padding:"9px 13px",color:"#EDD9B0",fontSize:14,fontFamily:"'Shippori Mincho',serif",width:"100%",letterSpacing:"0.04em" }}
+              />
+            ))}
+            {error&&<div style={{ color:"#E06050",fontSize:12,fontFamily:"'Shippori Mincho',serif" }}>{error}</div>}
+            <button onClick={handleAdd} style={{ background:"linear-gradient(135deg,#6B3A1A,#9A5528)",border:"none",borderRadius:8,padding:"10px",color:"#F5E8C8",fontSize:13,fontFamily:"'Shippori Mincho',serif",cursor:"pointer",letterSpacing:"0.1em",marginTop:2,boxShadow:"0 2px 10px rgba(0,0,0,0.4)" }}>
+              読了として積む
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* 著者フィルター */}
       {authors.length>1&&(
