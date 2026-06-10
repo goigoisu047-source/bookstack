@@ -262,23 +262,37 @@ function SwipeContainer({ towers, activeIdx, setActiveIdx, allBooks, onUpdateBoo
   const isDragging = useRef(false);
   const [dragOffset, setDragOffset] = useState(0);
 
+  const startY = useRef(null);
+  const isHorizontal = useRef(null);
+
   const handleTouchStart = e => {
     startX.current = e.touches[0].clientX;
+    startY.current = e.touches[0].clientY;
     isDragging.current = true;
+    isHorizontal.current = null;
   };
   const handleTouchMove = e => {
     if (!isDragging.current || startX.current === null) return;
     const dx = e.touches[0].clientX - startX.current;
+    const dy = e.touches[0].clientY - startY.current;
+    if (isHorizontal.current === null) {
+      if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
+      isHorizontal.current = Math.abs(dx) > Math.abs(dy);
+    }
+    if (!isHorizontal.current) return;
+    e.preventDefault();
     setDragOffset(dx);
   };
   const handleTouchEnd = () => {
-    if (Math.abs(dragOffset) > 60) {
+    if (isHorizontal.current && Math.abs(dragOffset) > 60) {
       if (dragOffset < 0 && activeIdx < towers.length - 1) setActiveIdx(i => i + 1);
       if (dragOffset > 0 && activeIdx > 0) setActiveIdx(i => i - 1);
     }
     setDragOffset(0);
     isDragging.current = false;
     startX.current = null;
+    startY.current = null;
+    isHorizontal.current = null;
   };
 
   // マウスドラッグ対応
@@ -382,6 +396,7 @@ export default function App() {
         @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;600&family=Shippori+Mincho:wght@400;600&display=swap');
         @keyframes dropIn{from{transform:translateY(-28px) scaleY(0.65);opacity:0}to{transform:translateY(0) scaleY(1);opacity:1}}
         @keyframes fadeSlide{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+        html,body{background:#0E0A04;margin:0;padding:0;}
         input::placeholder{color:rgba(180,150,100,0.4);font-family:'Shippori Mincho',serif;}
         input:focus{outline:none;border-color:#A0784A!important;}
         *{box-sizing:border-box;}
@@ -403,13 +418,13 @@ export default function App() {
               <button onClick={()=>setRenamingId(null)} style={{ background:"none",border:"none",color:"rgba(180,100,80,0.7)",fontSize:14,cursor:"pointer" }}>✕</button>
             </div>
           ) : (
-            <div style={{ display:"flex",alignItems:"center",justifyContent:"center",gap:8 }}>
+            <div style={{ position:"relative",display:"inline-flex",alignItems:"center",justifyContent:"center" }}>
               <h1 style={{ fontSize:22,margin:0,fontWeight:400,fontFamily:"'Shippori Mincho',serif",color:"#EDD9B0",letterSpacing:"0.06em" }}>
                 {currentTower?.name}
               </h1>
               {!currentTower?.isDefault && (
                 <button onClick={()=>{setRenamingId(currentTower.id);setRenameValue(currentTower.name);}}
-                  style={{ background:"none",border:"none",color:"rgba(180,150,80,0.4)",fontSize:11,cursor:"pointer",padding:"2px 4px" }} title="名前を変更">✎</button>
+                  style={{ position:"absolute",left:"calc(100% + 6px)",background:"none",border:"none",color:"rgba(180,150,80,0.4)",fontSize:11,cursor:"pointer",padding:"2px 4px",whiteSpace:"nowrap" }} title="名前を変更">✎</button>
               )}
             </div>
           )}
